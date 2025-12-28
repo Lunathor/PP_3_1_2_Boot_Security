@@ -35,7 +35,7 @@ public class DataInitializer {
 
         // Create admin user
         if (userService.findByUsername("admin") == null) {
-            User admin = new User("admin", "admin", "admin@mail.ru", 30);
+            User admin = new User("admin", "admin", "admin", "admin", "admin@mail.ru", 30);
             Set<Role> adminRoles = new HashSet<>();
             adminRoles.add(roleService.findByName("ROLE_ADMIN"));
             adminRoles.add(roleService.findByName("ROLE_USER"));
@@ -45,7 +45,7 @@ public class DataInitializer {
 
         // Create regular user
         if (userService.findByUsername("user") == null) {
-            User user = new User("user", "user", "user@mail.ru", 25);
+            User user = new User("user", "user", "user", "user", "user@mail.ru", 25);
             Set<Role> userRoles = new HashSet<>();
             userRoles.add(roleService.findByName("ROLE_USER"));
             user.setRoles(userRoles);

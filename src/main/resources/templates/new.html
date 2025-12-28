@@ -1,99 +1,166 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-    <title>New User</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New User</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
         }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="text"], input[type="password"], input[type="email"], input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-        .checkbox-group {
-            margin-top: 10px;
-        }
-        .checkbox-group label {
-            font-weight: normal;
-            display: inline;
-            margin-left: 5px;
-        }
-        button {
-            background-color: #4CAF50;
+        .header-bar {
+            background-color: #424242;
             color: white;
             padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            margin-right: 10px;
+            margin: 0;
+            width: 100%;
         }
-        button:hover {
-            background-color: #45a049;
+        .sidebar {
+            background-color: #e3f2fd;
+            padding: 20px;
+            min-height: calc(100vh - 50px);
         }
-        .btn-cancel {
-            background-color: #f44336;
+        .sidebar .nav-link {
+            color: #1976d2;
+            font-weight: 500;
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            border-radius: 5px;
         }
-        .btn-cancel:hover {
-            background-color: #da190b;
+        .sidebar .nav-link.active {
+            background-color: #1976d2;
+            color: white;
         }
-        .link {
-            color: #2196F3;
-            text-decoration: none;
+        .nav-tabs .nav-link {
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            margin-right: 5px;
         }
-        .link:hover {
-            text-decoration: underline;
+        .nav-tabs .nav-link.active {
+            background-color: #f8f9fa;
+            border-color: #dee2e6 #dee2e6 #f8f9fa;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        @media (max-width: 991.98px) {
+            .sidebar {
+                min-height: unset;
+                margin-bottom: 0;
+            }
+            .main-content {
+                padding: 15px;
+            }
+            .header-bar {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            .header-bar .btn {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
+        }
+        @media (max-width: 575.98px) {
+            .main-content {
+                padding: 10px;
+            }
+            .sidebar {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            h3 {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
-<h1>Create New User</h1>
+    <div class="header-bar d-flex justify-content-between align-items-center">
+        <div>
+            <span th:if="${currentUser != null}" th:text="${currentUser.email}"></span>
+            <span th:if="${currentUser == null}" sec:authentication="principal.username"></span>
+            <span> with roles: </span>
+            <span th:each="role, iterStat : ${#authentication.authorities}" th:text="${role.authority.replace('ROLE_', '')}">
+                <span th:if="${!iterStat.last}"> </span>
+            </span>
+        </div>
+        <form th:action="@{/logout}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+        </form>
+    </div>
 
-<form th:action="@{/admin}" th:object="${user}" method="post">
-    <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" id="username" th:field="*{username}" required/>
-    </div>
-    <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="password" id="password" th:field="*{password}" required/>
-    </div>
-    <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" th:field="*{email}" required/>
-    </div>
-    <div class="form-group">
-        <label for="age">Age:</label>
-        <input type="number" id="age" th:field="*{age}" required/>
-    </div>
-    <div class="form-group">
-        <label>Roles:</label>
-        <div class="checkbox-group">
-            <div th:each="role : ${allRoles}">
-                <input type="checkbox" th:id="${'role_' + role.id}" th:value="${role.id}" name="selectedRoles"/>
-                <label th:for="${'role_' + role.id}" th:text="${role}"></label>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <div class="col-lg-2 col-md-3 sidebar">
+                <nav class="nav flex-column">
+                    <a class="nav-link active" th:href="@{/admin}">Admin</a>
+                    <a class="nav-link" th:href="@{/user}">User</a>
+                </nav>
+            </div>
+            <div class="col-lg-10 col-md-9 main-content">
+                <h1 class="mb-4">Admin panel</h1>
+                
+                <ul class="nav nav-tabs mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin}">Users table</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">New User</a>
+                    </li>
+                </ul>
+
+                <h3 class="mb-3">Add new user</h3>
+                
+                <div th:if="${param.error != null}" class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Error creating user. Please check all fields and try again.
+                </div>
+                
+                <form th:action="@{/admin}" th:object="${user}" method="post" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="firstName" class="form-label">First name</label>
+                        <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="lastName" class="form-label">Last name</label>
+                        <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="age" class="form-label">Age</label>
+                        <input type="number" class="form-control" id="age" th:field="*{age}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" th:field="*{username}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" name="selectedRoles" multiple size="2">
+                            <option th:each="role : ${allRoles}" 
+                                    th:value="${role.id}" 
+                                    th:text="${role.toString()}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success">Add new user</button>
+                        <a th:href="@{/admin}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-    <button type="submit">Create</button>
-    <a th:href="@{/admin}" class="link">Cancel</a>
-</form>
 
-<form th:action="@{/logout}" method="post" style="margin-top: 20px;">
-    <button type="submit" class="btn-cancel">Logout</button>
-</form>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

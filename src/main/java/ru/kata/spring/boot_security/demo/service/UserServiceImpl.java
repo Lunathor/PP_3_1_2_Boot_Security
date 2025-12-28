@@ -31,7 +31,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUser(User user) {
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be null or empty");
+        }
+        if (user.getUsername() == null || user.getUsername().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+        if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
+            user.setFirstName(user.getUsername());
+        }
+        if (user.getLastName() == null || user.getLastName().isEmpty()) {
+            user.setLastName(user.getUsername());
+        }
         userRepository.save(user);
     }
 

@@ -1,70 +1,132 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-    <title>User Page</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
         }
-        .user-info {
-            background-color: #f5f5f5;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .user-info p {
-            margin: 10px 0;
-        }
-        .logout-form {
-            margin-top: 20px;
-        }
-        button {
-            background-color: #f44336;
+        .header-bar {
+            background-color: #424242;
             color: white;
             padding: 10px 20px;
-            border: none;
-            cursor: pointer;
+            margin: 0;
+            width: 100%;
         }
-        button:hover {
-            background-color: #da190b;
+        .sidebar {
+            background-color: #e3f2fd;
+            padding: 20px;
+            min-height: calc(100vh - 50px);
         }
-        .link {
-            color: #2196F3;
-            text-decoration: none;
-            margin-right: 15px;
+        .sidebar .nav-link {
+            color: #1976d2;
+            font-weight: 500;
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            border-radius: 5px;
         }
-        .link:hover {
-            text-decoration: underline;
+        .sidebar .nav-link.active {
+            background-color: #1976d2;
+            color: white;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        @media (max-width: 991.98px) {
+            .sidebar {
+                min-height: unset;
+                margin-bottom: 0;
+            }
+            .main-content {
+                padding: 15px;
+            }
+            .header-bar {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            .header-bar .btn {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
+        }
+        @media (max-width: 575.98px) {
+            .main-content {
+                padding: 10px;
+            }
+            .sidebar {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            h3 {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
-<h1>User, welcome spring boot security page!</h1>
+    <div class="header-bar d-flex justify-content-between align-items-center">
+        <div>
+            <span th:text="${user.email}"></span>
+            <span> with roles: </span>
+            <span th:each="role, iterStat : ${user.roles}" th:text="${role.toString()}">
+                <span th:if="${!iterStat.last}"> </span>
+            </span>
+        </div>
+        <form th:action="@{/logout}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+        </form>
+    </div>
 
-<div class="user-info">
-    <h2>Your Information:</h2>
-    <p><strong>ID:</strong> <span th:text="${user.id}"></span></p>
-    <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
-    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
-    <p><strong>Age:</strong> <span th:text="${user.age}"></span></p>
-    <p><strong>Roles:</strong> 
-        <span th:each="role, iterStat : ${user.roles}" th:text="${role}">
-            <span th:if="${!iterStat.last}">, </span>
-        </span>
-    </p>
-</div>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <div class="col-lg-2 col-md-3 sidebar">
+                <nav class="nav flex-column">
+                    <a class="nav-link" sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">Admin</a>
+                    <a class="nav-link active" th:href="@{/user}">User</a>
+                </nav>
+            </div>
+            <div class="col-lg-10 col-md-9 main-content">
+                <h1 class="mb-4">User information-page</h1>
+                <h3 class="mb-3">About user</h3>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Age</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td th:text="${user.id}"></td>
+                                <td th:text="${user.firstName}"></td>
+                                <td th:text="${user.lastName}"></td>
+                                <td th:text="${user.age}"></td>
+                                <td th:text="${user.email}"></td>
+                                <td>
+                                    <span th:each="role, iterStat : ${user.roles}" th:text="${role.toString()}">
+                                        <span th:if="${!iterStat.last}"> </span>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div sec:authorize="hasRole('ADMIN')">
-    <a th:href="@{/admin}" class="link">Admin Panel</a>
-</div>
-
-<form th:action="@{/logout}" method="post" class="logout-form">
-    <button type="submit">Logout</button>
-</form>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
