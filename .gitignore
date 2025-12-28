@@ -18,6 +18,7 @@ target/
 *.iws
 *.iml
 *.ipr
+out/
 
 ### NetBeans ###
 /nbproject/private/
@@ -31,3 +32,57 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Eclipse ###
+.classpath
+.project
+.settings/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.loadpath
+.recommenders
+
+### Maven ###
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+### H2 Database ###
+*.db
+*.mv.db
+*.trace.db
+*.lock.db
+data/
+
+### Logs ###
+*.log
+logs/
+log/
+
+### OS ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+### Application specific ###
+application-local.properties
+application-dev.properties
+*.pid
+*.seed
+*.pid.lock
+
+### Temporary files ###
+*.tmp
+*.temp
+*.cache
+.cache/
+ARCHITECTURE_EXPLANATION.md

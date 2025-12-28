@@ -1,11 +1,70 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-    <title>Spring Security Example</title>
+    <title>User Page</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .user-info {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .user-info p {
+            margin: 10px 0;
+        }
+        .logout-form {
+            margin-top: 20px;
+        }
+        button {
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #da190b;
+        }
+        .link {
+            color: #2196F3;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 <h1>User, welcome spring boot security page!</h1>
 
+<div class="user-info">
+    <h2>Your Information:</h2>
+    <p><strong>ID:</strong> <span th:text="${user.id}"></span></p>
+    <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+    <p><strong>Age:</strong> <span th:text="${user.age}"></span></p>
+    <p><strong>Roles:</strong> 
+        <span th:each="role, iterStat : ${user.roles}" th:text="${role}">
+            <span th:if="${!iterStat.last}">, </span>
+        </span>
+    </p>
+</div>
+
+<div sec:authorize="hasRole('ADMIN')">
+    <a th:href="@{/admin}" class="link">Admin Panel</a>
+</div>
+
+<form th:action="@{/logout}" method="post" class="logout-form">
+    <button type="submit">Logout</button>
+</form>
 
 </body>
 </html>
