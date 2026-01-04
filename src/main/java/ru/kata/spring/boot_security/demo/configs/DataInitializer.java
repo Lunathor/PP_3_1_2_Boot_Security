@@ -36,20 +36,18 @@ public class DataInitializer {
         // Create admin user
         if (userService.findByUsername("admin") == null) {
             User admin = new User("admin", "admin", "admin", "admin", "admin@mail.ru", 30);
-            Set<Role> adminRoles = new HashSet<>();
-            adminRoles.add(roleService.findByName("ROLE_ADMIN"));
-            adminRoles.add(roleService.findByName("ROLE_USER"));
-            admin.setRoles(adminRoles);
-            userService.saveUser(admin);
+            Set<Long> adminRoleIds = new HashSet<>();
+            adminRoleIds.add(roleService.findByName("ROLE_ADMIN").getId());
+            adminRoleIds.add(roleService.findByName("ROLE_USER").getId());
+            userService.saveUser(admin, adminRoleIds);
         }
 
         // Create regular user
         if (userService.findByUsername("user") == null) {
             User user = new User("user", "user", "user", "user", "user@mail.ru", 25);
-            Set<Role> userRoles = new HashSet<>();
-            userRoles.add(roleService.findByName("ROLE_USER"));
-            user.setRoles(userRoles);
-            userService.saveUser(user);
+            Set<Long> userRoleIds = new HashSet<>();
+            userRoleIds.add(roleService.findByName("ROLE_USER").getId());
+            userService.saveUser(user, userRoleIds);
         }
     }
 }

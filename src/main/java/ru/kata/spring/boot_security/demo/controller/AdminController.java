@@ -4,13 +4,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.model.Role;
+import ru.kata.spring.boot_security.demo.dto.UserUpdateDto;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -27,13 +29,9 @@ public class AdminController {
     public String adminPage(Model model) {
         model.addAttribute("users", userService.getAllUsers());
         model.addAttribute("allRoles", roleService.getAllRoles());
-        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().toString().equals("anonymousUser")) {
-            String username = auth.getName();
-            ru.kata.spring.boot_security.demo.model.User currentUser = userService.findByUsername(username);
-            if (currentUser != null) {
-                model.addAttribute("currentUser", currentUser);
-            }
+        User currentUser = userService.getCurrentUser();
+        if (currentUser != null) {
+            model.addAttribute("currentUser", currentUser);
         }
         return "admin";
     }
@@ -42,13 +40,9 @@ public class AdminController {
     public String newUserForm(Model model) {
         model.addAttribute("user", new User());
         model.addAttribute("allRoles", roleService.getAllRoles());
-        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().toString().equals("anonymousUser")) {
-            String username = auth.getName();
-            ru.kata.spring.boot_security.demo.model.User currentUser = userService.findByUsername(username);
-            if (currentUser != null) {
-                model.addAttribute("currentUser", currentUser);
-            }
+        User currentUser = userService.getCurrentUser();
+        if (currentUser != null) {
+            model.addAttribute("currentUser", currentUser);
         }
         return "new";
     }
@@ -57,27 +51,11 @@ public class AdminController {
     public String createUser(@ModelAttribute("user") User user,
                              @RequestParam(value = "selectedRoles", required = false) Long[] selectedRoles) {
         try {
-            Set<Role> roles = new HashSet<>();
-            if (selectedRoles != null && selectedRoles.length > 0) {
-                for (Long roleId : selectedRoles) {
-                    Role role = roleService.getRoleById(roleId);
-                    if (role != null) {
-                        roles.add(role);
-                    }
-                }
-            }
-            // Если роли не выбраны, устанавливаем роль USER по умолчанию
-            if (roles.isEmpty()) {
-                Role userRole = roleService.findByName("ROLE_USER");
-                if (userRole != null) {
-                    roles.add(userRole);
-                }
-            }
-            user.setRoles(roles);
-            userService.saveUser(user);
+            Set<Long> roleIds = selectedRoles != null ? 
+                    Arrays.stream(selectedRoles).collect(Collectors.toSet()) : new HashSet<>();
+            userService.saveUser(user, roleIds);
             return "redirect:/admin";
         } catch (Exception e) {
-            // Логируем ошибку для отладки
             e.printStackTrace();
             return "redirect:/admin/new?error=true";
         }
@@ -85,31 +63,9 @@ public class AdminController {
 
     @PatchMapping("/{id}")
     public String updateUser(@PathVariable("id") Long id,
-                             @RequestParam(value = "firstName") String firstName,
-                             @RequestParam(value = "lastName") String lastName,
-                             @RequestParam(value = "age") Integer age,
-                             @RequestParam(value = "email") String email,
-                             @RequestParam(value = "password", required = false) String password,
-                             @RequestParam(value = "selectedRoles", required = false) Long[] selectedRoles) {
-        User user = userService.getUserById(id);
-        if (user != null) {
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
-            user.setAge(age);
-            user.setEmail(email);
-            if (password != null && !password.isEmpty()) {
-                user.setPassword(password);
-            }
-            
-            Set<Role> roles = new HashSet<>();
-            if (selectedRoles != null) {
-                for (Long roleId : selectedRoles) {
-                    roles.add(roleService.getRoleById(roleId));
-                }
-            }
-            user.setRoles(roles);
-            userService.updateUser(user);
-        }
+                             @ModelAttribute UserUpdateDto userUpdateDto) {
+        userUpdateDto.setId(id);
+        userService.updateUser(userUpdateDto);
         return "redirect:/admin";
     }
 
